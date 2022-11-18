@@ -81,6 +81,9 @@ extension EditDictionaryViewController : DictionaryCellDelegate {
 extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDelegate {
     //Get Data on Keyword
     func updateSearchResults(for searchController: UISearchController) {
+        //Hiding when user touch to searchbar, now we use Save Button of SearchBar
+        navigationItem.rightBarButtonItem?.isHidden = true
+        
         guard let text = searchController.searchBar.text else{
             return
         }
@@ -102,6 +105,7 @@ extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDel
         }else{
             self.keys = Array(result.keys)
         }
+        
         self.dataCollectionView.reloadData()
     }
     
