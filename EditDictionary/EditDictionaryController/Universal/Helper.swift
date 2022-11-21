@@ -24,7 +24,7 @@ class Helper{
     static func convertToJsonData(dic: [String : Any], completion : @escaping ([String : Any]) -> ()){
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted)
-
+            
             let decoded = try JSONSerialization.jsonObject(with: jsonData, options: [])
             
             if let dictFromJSON = decoded as? [String:Any] {
@@ -67,14 +67,24 @@ extension String {
     }
     
     
-    var isDouble: Bool {
-        let digitsCharacters = CharacterSet(charactersIn: "0123456789.")
-        return CharacterSet(charactersIn: self).isSubset(of: digitsCharacters)
+    func isInt() -> Bool {
+        
+        if Int(self) != nil {
+            return true
+        }
+        
+        return false
     }
     
-    var isInt: Bool {
-        let digitsCharacters = CharacterSet(charactersIn: "0123456789")
-        return CharacterSet(charactersIn: self).isSubset(of: digitsCharacters)
+    
+    
+    func isDouble() -> Bool {
+        
+        if Double(self) != nil {
+            return true
+        }
+        
+        return false
     }
     
 }

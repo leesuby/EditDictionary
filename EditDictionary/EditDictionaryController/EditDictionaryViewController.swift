@@ -66,9 +66,7 @@ class EditDictionaryViewController: UIViewController {
             return
         }
     
-        Helper.convertToJsonData(dic: dictionary) { result in
-            self.delegate?.changedData(data: result)
-        }
+        delegate?.changedData(data: dictionary)
         
         navigationController?.popViewController(animated: true)
     }
@@ -121,11 +119,9 @@ extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDel
         guard let dictionary = listJson else{
             return
         }
+        
+        delegate?.changedData(data: dictionary)
 
-        Helper.convertToJsonData(dic: dictionary) { result in
-            self.delegate?.changedData(data: result)
-        }
-    
         //Because there is 2 ViewController : Edit + Search
         navigationController?.popViewController(animated: true)
         navigationController?.popViewController(animated: true)

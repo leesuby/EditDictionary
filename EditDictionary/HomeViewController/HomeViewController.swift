@@ -38,6 +38,9 @@ class HomeViewController: UIViewController{
 
 extension HomeViewController: EditDictionaryDelegate{
     func changedData(data: [String : Any]?) {
+        data?.forEach({ (key: String, value: Any) in
+            print(type(of: value))
+        })
         print(data)
     }
 }

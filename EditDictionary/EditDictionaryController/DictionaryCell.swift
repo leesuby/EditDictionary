@@ -7,6 +7,10 @@
 
 import UIKit
 
+enum DataType{
+    case number
+    case string
+}
 
 protocol DictionaryCellDelegate{
     func textViewDidChange(key: String, value: Any)
@@ -15,9 +19,9 @@ protocol DictionaryCellDelegate{
 class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     
     var itemsNumber : Int?
-    private var keyText : UILabel!
-    private var valueText : UITextView!
-    private var typeOfValue : Any.Type?
+    private var keyLabel : UILabel!
+    private var valueTextView : UITextView!
+    private var typeOfValue : DataType?
     var delegate : DictionaryCellDelegate?
 
     override init(frame: CGRect) {
@@ -28,49 +32,55 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     }
     
     func initView(){
-        keyText = UILabel()
-        keyText.textColor = Constant.Text.color
-        keyText.textAlignment = .right
-        keyText.font = Constant.Text.font
+        keyLabel = UILabel()
+        keyLabel.textColor = Constant.Text.color
+        keyLabel.textAlignment = .right
+        keyLabel.font = Constant.Text.font
         
-        valueText = UITextView()
-        valueText.textColor = Constant.Text.color
-        valueText.font = Constant.Text.font
-        valueText.layer.borderColor = UIColor.black.cgColor
-        valueText.layer.borderWidth = 1
-        valueText.delegate = self
+        valueTextView = UITextView()
+        valueTextView.textColor = Constant.Text.color
+        valueTextView.font = Constant.Text.font
+        valueTextView.layer.borderColor = UIColor.black.cgColor
+        valueTextView.layer.borderWidth = 1
+        valueTextView.delegate = self
     }
     
     func initConstraint(){
-        addSubview(keyText)
-        keyText.translatesAutoresizingMaskIntoConstraints = false
-        keyText.topAnchor.constraint(equalTo: topAnchor, constant: Constant.padding).isActive = true
-        keyText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constant.padding).isActive = true
-        keyText.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1/3).isActive = true
-        keyText.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Constant.padding).isActive = true
+        addSubview(keyLabel)
+        keyLabel.translatesAutoresizingMaskIntoConstraints = false
+        keyLabel.topAnchor.constraint(equalTo: topAnchor, constant: Constant.padding).isActive = true
+        keyLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constant.padding).isActive = true
+        keyLabel.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1/3).isActive = true
+        keyLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Constant.padding).isActive = true
         
-        addSubview(valueText)
-        valueText.translatesAutoresizingMaskIntoConstraints = false
-        valueText.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        valueText.leadingAnchor.constraint(equalTo: keyText.trailingAnchor, constant: Constant.padding).isActive = true
-        valueText.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 2/3 ,constant: -(2*Constant.padding)).isActive = true
-        valueText.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        addSubview(valueTextView)
+        valueTextView.translatesAutoresizingMaskIntoConstraints = false
+        valueTextView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        valueTextView.leadingAnchor.constraint(equalTo: keyLabel.trailingAnchor, constant: Constant.padding).isActive = true
+        valueTextView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 2/3 ,constant: -(2*Constant.padding)).isActive = true
+        valueTextView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        let key = keyText.text?.dropLast(1) ?? ""
+        let key = keyLabel.text?.dropLast(1) ?? ""
         
         //Valid JSON datatypes: number, string, array(String), bool -> __NSCFNumber, __NSCFString
         let value : Any!
-        if valueText.text.isDouble {
-            value = Double(valueText.text)
-        }else if valueText.text.isInt{
-            value = Int(valueText.text)
-        } else if let bool = valueText.text.isBool{
-            value = bool
-        } else {
-            value = valueText.text
+    
+        switch typeOfValue{
+        case .number:
+            if(valueTextView.text.isDouble()){
+                value = NSNumber(value: Double(valueTextView.text) ?? 0)
+            }
+            else{
+                //Case: User enter Character in Number Field
+                return
+            }
+        case .string:
+            value = NSString(string: valueTextView.text)
+        case .none:
+            value = nil
         }
         
         delegate?.textViewDidChange(key: String(key), value: value ?? "")
@@ -78,9 +88,14 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     }
     
     func config(key: String, value: Any){
-        keyText.text = "\(key):"
-        typeOfValue = type(of: value)
-        valueText.text = String(describing: value)
+        keyLabel.text = "\(key):"
+        switch value{
+        case is NSNumber:
+            typeOfValue = .number
+        default:
+            typeOfValue = .string
+        }
+        valueTextView.text = String(describing: value)
     }
     
     required init?(coder: NSCoder) {
