@@ -19,6 +19,21 @@ class Helper{
         }
         return nil
     }
+    
+    //Using to convert dictionary and cast data to datatype of Json (__NSCFNumber, __NSCFString...)
+    static func convertToJsonData(dic: [String : Any], completion : @escaping ([String : Any]) -> ()){
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted)
+
+            let decoded = try JSONSerialization.jsonObject(with: jsonData, options: [])
+            
+            if let dictFromJSON = decoded as? [String:Any] {
+                completion(dictFromJSON)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
 }
 
 
@@ -36,4 +51,30 @@ extension String {
         
         return ceil(boundingBox.width)
     }
+    
+    var isBool: Bool? {
+        switch self.lowercased() {
+        case "true", "t", "yes", "y":
+            return true
+        case "false", "f", "no", "n", "":
+            return false
+        default:
+            if let int = Int(self) {
+                return int != 0
+            }
+            return nil
+        }
+    }
+    
+    
+    var isDouble: Bool {
+        let digitsCharacters = CharacterSet(charactersIn: "0123456789.")
+        return CharacterSet(charactersIn: self).isSubset(of: digitsCharacters)
+    }
+    
+    var isInt: Bool {
+        let digitsCharacters = CharacterSet(charactersIn: "0123456789")
+        return CharacterSet(charactersIn: self).isSubset(of: digitsCharacters)
+    }
+    
 }

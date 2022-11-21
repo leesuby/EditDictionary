@@ -62,7 +62,14 @@ class EditDictionaryViewController: UIViewController {
     }
     
     @objc func saveTapped(){
-        delegate?.changedData(data: listJson)
+        guard let dictionary = listJson else{
+            return
+        }
+    
+        Helper.convertToJsonData(dic: dictionary) { result in
+            self.delegate?.changedData(data: result)
+        }
+        
         navigationController?.popViewController(animated: true)
     }
    
@@ -72,7 +79,7 @@ class EditDictionaryViewController: UIViewController {
 
 //MARK: Cell Delegate
 extension EditDictionaryViewController : DictionaryCellDelegate {
-    func textViewDidChange(key: String, value: String) {
+    func textViewDidChange(key: String, value: Any) {
         listJson?[key] = value
     }
 }
@@ -111,8 +118,14 @@ extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDel
     
     //Save data
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        delegate?.changedData(data: listJson)
-        
+        guard let dictionary = listJson else{
+            return
+        }
+
+        Helper.convertToJsonData(dic: dictionary) { result in
+            self.delegate?.changedData(data: result)
+        }
+    
         //Because there is 2 ViewController : Edit + Search
         navigationController?.popViewController(animated: true)
         navigationController?.popViewController(animated: true)

@@ -9,7 +9,7 @@ import UIKit
 
 
 protocol DictionaryCellDelegate{
-    func textViewDidChange(key: String, value: String)
+    func textViewDidChange(key: String, value: Any)
 }
 
 class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
@@ -17,6 +17,7 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     var itemsNumber : Int?
     private var keyText : UILabel!
     private var valueText : UITextView!
+    private var typeOfValue : Any.Type?
     var delegate : DictionaryCellDelegate?
 
     override init(frame: CGRect) {
@@ -59,12 +60,26 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
         let key = keyText.text?.dropLast(1) ?? ""
-        delegate?.textViewDidChange(key: String(key), value: valueText.text ?? "")
+        
+        //Valid JSON datatypes: number, string, array(String), bool -> __NSCFNumber, __NSCFString
+        let value : Any!
+        if valueText.text.isDouble {
+            value = Double(valueText.text)
+        }else if valueText.text.isInt{
+            value = Int(valueText.text)
+        } else if let bool = valueText.text.isBool{
+            value = bool
+        } else {
+            value = valueText.text
+        }
+        
+        delegate?.textViewDidChange(key: String(key), value: value ?? "")
         
     }
     
     func config(key: String, value: Any){
         keyText.text = "\(key):"
+        typeOfValue = type(of: value)
         valueText.text = String(describing: value)
     }
     

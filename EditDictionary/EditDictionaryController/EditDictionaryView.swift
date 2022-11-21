@@ -24,7 +24,6 @@ class EditDictionaryView {
         }
         
         vc.view.backgroundColor = .white
-        
         vc.dataCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout.init())
         vc.dataCollectionView.backgroundColor = .white
     }
