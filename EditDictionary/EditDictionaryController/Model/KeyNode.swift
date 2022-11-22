@@ -10,6 +10,7 @@ import Foundation
 struct KeyNode{
     var parent: [String]?
     var key: String = ""
+    var isArray: Bool = false
     
     init(parent: [String]){
         self.parent = parent

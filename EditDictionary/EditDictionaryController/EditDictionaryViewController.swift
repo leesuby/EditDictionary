@@ -26,7 +26,6 @@ class EditDictionaryViewController: UIViewController {
                 
                 //Convert to keys
                 keys = Array(dict.keys)
-                
             }
                 else{
                     print("You should set DataSource for EditDictionaryViewController by implement EditDictionaryDatasource")
@@ -72,23 +71,104 @@ class EditDictionaryViewController: UIViewController {
     }
     
     @objc func saveTapped(){
-        guard let dictionary = listJson else{
+        guard listJson != nil else{
             return
         }
     
-        delegate?.changedData(data: dictionary)
+        print(rebaseDictionary(dictionary: dict))
+        
+        //delegate?.changedData(data: listJson)
         
         navigationController?.popViewController(animated: true)
     }
+    
+    func rebaseDictionary(dictionary d : [KeyNode : Any]) -> TreeDict{
+        var result : TreeDict = TreeDict(listDict: [])
+        
+        var alreadyCheck : [[String]?]  = []
+        d.forEach { (keyNode: KeyNode, value: Any) in
+            if !alreadyCheck.contains(keyNode.parent){
+                alreadyCheck.append(keyNode.parent)
+                var dictSameParent : [String : Any] = [ : ]
+                d.forEach { (keyNode2: KeyNode, value2: Any) in
+                    if(keyNode2.parent == keyNode.parent){
+                        
+                        if (keyNode2.isArray){
+                            print(keyNode2.key)
+                            let stringData : String = value as! String
+                            dictSameParent[keyNode2.key] = (stringData.toJSON()) as? NSArray
+                        }else{
+                            dictSameParent[keyNode2.key] = value}
+                    }
+                }
+                result.listDict.append(DictNode(parent: keyNode.parent, dict: dictSameParent))
+            }
+            
+        }
+        print(alreadyCheck)
+        return result
+//            alreadyCheck.append(parent)
+//            guard let parent = keyNode.parent else{
+//                if (keyNode.isArray){
+//                    let stringData : String = value as! String
+//                    dict[keyNode.key] = (stringData.toJSON()) as? NSArray
+//                }else{
+//                    dict[keyNode.key] = value}
+//                return
+//            }
+//            if(!parent.isEmpty){
+//                count = count + 1
+//                result.listDict.append(DictNode(pa: count, dict: dict))
+//                dict = [ keyNode.key : "" ]
+//            }
+        }
+//        d.forEach { (keyNode: KeyNode, value: Any) in
+//            guard let parent = keyNode.parent else{
+//                if (keyNode.isArray){
+//                    let stringData : String = value as! String
+//                    result[keyNode.key] = (stringData.toJSON()) as? NSArray
+//                }else{
+//                    result[keyNode.key] = value}
+//                return
+//            }
+//            if(!parent.isEmpty){
+//                setValueToLeaf(node: &result, keyNode: keyNode, value: value, numsParent: keyNode.parent!.count )
+//            }
+//        }
+//        var result : [String : Any] = [ : ]
+//        d.forEach { (keyNode: KeyNode, value: Any) in
+//            guard let parent = keyNode.parent else{
+//                if (keyNode.isArray){
+//                    let stringData : String = value as! String
+//                    result[keyNode.key] = (stringData.toJSON()) as? NSArray
+//                }else{
+//                    result[keyNode.key] = value}
+//                return
+//            }
+//            if(!parent.isEmpty){
+//                setValueToLeaf(node: &result, keyNode: keyNode, value: value, numsParent: keyNode.parent!.count )
+//            }
+//        }
+    }
+    
+//    func setValueToLeaf(node : inout [String : Any], keyNode: KeyNode, value : Any, numsParent: Int){
+//        if(numsParent == 0){
+//            node[keyNode.key] = value
+//        }else{
+//            let parentKey : String = keyNode.parent![keyNode.parent!.count - numsParent]
+//            node[parentKey] as! [String : Any]
+//            setValueToLeaf(node: &node[parentKey], keyNode: keyNode, value: value, numsParent: numsParent - 1)
+//        }
+//    }
    
-}
+
 
 
 
 //MARK: Cell Delegate
 extension EditDictionaryViewController : DictionaryCellDelegate {
-    func textViewDidChange(key: String, value: Any) {
-        listJson?[key] = value
+    func textViewDidChange(keyNode: KeyNode, value: Any) {
+        dict[keyNode] = value
     }
 }
 
@@ -163,11 +243,11 @@ extension EditDictionaryViewController : UICollectionViewDataSource{
 extension EditDictionaryViewController : UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let calculatedHeightValue = String(describing: dict[keys![indexPath.item]]).height(withConstrainedWidth: collectionView.frame.size.width * 2/3, font: Constant.Text.font)
+        let calculatedHeightValue = String(describing: dict[keys![indexPath.item]]).height(withConstrainedWidth: collectionView.frame.size.width * 2/3 - Constant.padding, font: Constant.Text.font)
         
-        let calculatedHeightKey = keys![indexPath.item].key.height(withConstrainedWidth: collectionView.frame.size.width * 1/3, font: Constant.Text.font)
+        let calculatedHeightKey = Helper.generateString(keyNode: keys![indexPath.item]).height(withConstrainedWidth: collectionView.frame.size.width * 1/3 - Constant.padding , font: Constant.Text.font)
         
-        return CGSize(width: collectionView.frame.size.width, height: calculatedHeightKey > calculatedHeightValue ? calculatedHeightKey + Constant.padding*2 : calculatedHeightValue + Constant.padding*2)
+        return CGSize(width: collectionView.frame.size.width, height: calculatedHeightKey > calculatedHeightValue ? calculatedHeightKey + Constant.padding * 2 : calculatedHeightValue + Constant.padding * 2)
     }
 
 }

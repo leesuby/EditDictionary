@@ -8,6 +8,22 @@
 import Foundation
 import UIKit
 
+class Helper{
+    static func generateString(keyNode : KeyNode) -> String{
+        guard let parentsKey = keyNode.parent else{
+            return keyNode.key
+        }
+        var result: String = ""
+        
+        parentsKey.forEach { parent in
+            result.append("\(parent).")
+        }
+        
+        result.append(keyNode.key)
+        
+        return result
+    }
+}
 extension String {
     func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
@@ -58,4 +74,10 @@ extension String {
         return false
     }
     
+
+    func toJSON() -> Any? {
+        guard let data = self.data(using: .utf8, allowLossyConversion: false) else { return nil }
+        return try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
+    }
+
 }

@@ -28,24 +28,36 @@ class HomeView{
         jsonData.textColor = Constant.Text.color
         jsonData.text = """
       {
-        "id": 1,
-        "Information":{
-            "title": "iPhone 9",
-            "description": "An apple mobile which is nothing like apple",
-            "category": "smartphones"
-            },
-        "price": 549,
-        "rating": 4.69,
-        "stock": 94,
-        "thumbnail": "https://dummyjson.com/image/i/products/1/thumbnail.jpg",
-        "images": [
-          "https://dummyjson.com/image/i/products/1/1.jpg",
-          "https://dummyjson.com/image/i/products/1/2.jpg",
-          "https://dummyjson.com/image/i/products/1/3.jpg",
-          "https://dummyjson.com/image/i/products/1/4.jpg",
-          "https://dummyjson.com/image/i/products/1/thumbnail.jpg"
-        ],
-        "null": null
+          "items":
+              {
+                  "item":
+                          {
+                              "id": "0001",
+                              "type": "donut",
+                              "name": "Cake",
+                              "ppu": 0.55,
+                              "batters":
+                                  {
+                                      "batter":
+                                          [
+                                              { "id": "1001", "type": "Regular" },
+                                              { "id": "1002", "type": "Chocolate" },
+                                              { "id": "1003", "type": "Blueberry" },
+                                              { "id": "1004", "type": "Devil's Food" }
+                                          ]
+                                  },
+                              "topping":
+                                  [
+                                      { "id": "5001", "type": "None" },
+                                      { "id": "5002", "type": "Glazed" },
+                                      { "id": "5005", "type": "Sugar" },
+                                      { "id": "5007", "type": "Powdered Sugar" },
+                                      { "id": "5006", "type": "Chocolate with Sprinkles" },
+                                      { "id": "5003", "type": "Chocolate" },
+                                      { "id": "5004", "type": "Maple" }
+                                  ]
+                          }
+              }
       }
 """
         

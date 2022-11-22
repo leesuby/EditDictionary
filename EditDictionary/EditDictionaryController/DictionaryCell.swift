@@ -7,15 +7,15 @@
 
 import UIKit
 
+
 enum EditDataType{
     case number
     case string
     case null
-    
 }
 
 protocol DictionaryCellDelegate{
-    func textViewDidChange(key: String, value: Any)
+    func textViewDidChange(keyNode: KeyNode, value: Any)
 }
 
 class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
@@ -25,6 +25,7 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     private var valueTextView : UITextView!
     private var typeOfValue : EditDataType?
     var delegate : DictionaryCellDelegate?
+    var keyNode : KeyNode?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -38,6 +39,7 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
         keyLabel.textColor = Constant.Text.color
         keyLabel.textAlignment = .right
         keyLabel.font = Constant.Text.font
+        keyLabel.numberOfLines = 0
         
         valueTextView = UITextView()
         valueTextView.textColor = Constant.Text.color
@@ -65,8 +67,6 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        let key = keyLabel.text?.dropLast(1) ?? ""
-        
         //Valid JSON datatypes: number, string, array(String), bool -> __NSCFNumber, __NSCFString
         let value : Any!
     
@@ -76,23 +76,33 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
                 value = NSNumber(value: Double(valueTextView.text) ?? 0)
             }
             else{
-                //Case: User enter Character in Number Field
                 return
             }
+            
         case .string:
-            value = NSString(string: valueTextView.text)
+            if(valueTextView.text.elementsEqual("null")){
+                value = NSNull()}
+            else{
+                value = NSString(string: valueTextView.text)}
+            
         case .null:
-            value = NSNull()
+            // Case: Ban đầu là Null nhưng sau đó chỉnh sửa thành số hay chữ khác.
+            if(valueTextView.text.isDouble()){
+                value = NSNumber(value: Double(valueTextView.text) ?? 0)
+            }
+            else{
+                value = NSString(string: valueTextView.text)}
         case .none:
             value = nil
         }
         
-        delegate?.textViewDidChange(key: String(key), value: value ?? "")
+        delegate?.textViewDidChange(keyNode: self.keyNode!, value: value ?? "")
         
     }
     
     func config(keyNode: KeyNode, value: Any){
-        keyLabel.text = generateKeyLabel(keyNode: keyNode)
+        keyLabel.text = Helper.generateString(keyNode: keyNode)
+        self.keyNode = keyNode
         switch value{
         case is NSNumber:
             typeOfValue = .number
@@ -102,21 +112,6 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
             typeOfValue = .string
         }
         valueTextView.text = String(describing: value)
-    }
-     
-    func generateKeyLabel(keyNode : KeyNode) -> String{
-        guard let parentsKey = keyNode.parent else{
-            return keyNode.key
-        }
-        var result: String = ""
-        
-        parentsKey.forEach { parent in
-            result.append("\(parent).")
-        }
-        
-        result.append(keyNode.key)
-        
-        return result
     }
     
     required init?(coder: NSCoder) {
