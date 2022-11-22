@@ -8,35 +8,6 @@
 import Foundation
 import UIKit
 
-class Helper{
-    static func convertToDictionary(text: String) -> [String: Any]? {
-        if let data = text.data(using: .utf8) {
-            do {
-                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        return nil
-    }
-    
-    //Using to convert dictionary and cast data to datatype of Json (__NSCFNumber, __NSCFString...)
-    static func convertToJsonData(dic: [String : Any], completion : @escaping ([String : Any]) -> ()){
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: dic, options: .prettyPrinted)
-            
-            let decoded = try JSONSerialization.jsonObject(with: jsonData, options: [])
-            
-            if let dictFromJSON = decoded as? [String:Any] {
-                completion(dictFromJSON)
-            }
-        } catch {
-            print(error.localizedDescription)
-        }
-    }
-}
-
-
 extension String {
     func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)

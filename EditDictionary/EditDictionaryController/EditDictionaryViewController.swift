@@ -16,19 +16,26 @@ protocol EditDictionaryDataSource : AnyObject {
 }
 
 class EditDictionaryViewController: UIViewController {
-    //List Data get From Another Controller
+    //Origin Data get From Another Controller
     private var listJson : [String : Any]? {
         didSet{
             if(listJson != nil){
-                keys = Array(listJson!.keys)}
-            else{
-                print("You should set DataSource for EditDictionaryViewController by implement EditDictionaryDatasource")
+                var tmpKeyNode : KeyNode? = nil
+                DataConverter.flattenJSONDictionary(listJson: listJson!, result: &dict, parentKey: &tmpKeyNode)
+                print(dict)
+            }
+                else{
+                    print("You should set DataSource for EditDictionaryViewController by implement EditDictionaryDatasource")
+                }
             }
         }
-    }
+    
+    //Dictionary after convert from Origin Data
+    private var dict: [KeyNode : Any] = [ : ]
     
     //Array of keys get from listJson
     private var keys: [String]?
+    private var values: [Any]?
     
     private let searchController = UISearchController()
     private var editDictionaryView : EditDictionaryView?

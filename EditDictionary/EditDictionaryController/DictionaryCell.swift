@@ -7,9 +7,10 @@
 
 import UIKit
 
-enum DataType{
+enum EditDataType{
     case number
     case string
+    
 }
 
 protocol DictionaryCellDelegate{
@@ -21,7 +22,7 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
     var itemsNumber : Int?
     private var keyLabel : UILabel!
     private var valueTextView : UITextView!
-    private var typeOfValue : DataType?
+    private var typeOfValue : EditDataType?
     var delegate : DictionaryCellDelegate?
 
     override init(frame: CGRect) {

@@ -18,6 +18,8 @@
 		E75A9AD529261479006C6825 /* DictionaryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75A9AD429261479006C6825 /* DictionaryCell.swift */; };
 		E75A9AD729261622006C6825 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75A9AD629261622006C6825 /* Helper.swift */; };
 		E75A9ADA292618A4006C6825 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75A9AD9292618A4006C6825 /* Constant.swift */; };
+		E761DA80292CC391005F9A4D /* DataConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E761DA7F292CC391005F9A4D /* DataConverter.swift */; };
+		E761DA83292CC689005F9A4D /* KeyNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E761DA82292CC689005F9A4D /* KeyNode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		E75A9AD429261479006C6825 /* DictionaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryCell.swift; sourceTree = "<group>"; };
 		E75A9AD629261622006C6825 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		E75A9AD9292618A4006C6825 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
+		E761DA7F292CC391005F9A4D /* DataConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataConverter.swift; sourceTree = "<group>"; };
+		E761DA82292CC689005F9A4D /* KeyNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +93,7 @@
 		E75A9ACC29261126006C6825 /* EditDictionaryController */ = {
 			isa = PBXGroup;
 			children = (
+				E761DA81292CC67F005F9A4D /* Model */,
 				E75A9AD829261895006C6825 /* Universal */,
 				E75A9AD029261167006C6825 /* EditDictionaryViewController.swift */,
 				E75A9AD229261202006C6825 /* EditDictionaryView.swift */,
@@ -102,8 +107,17 @@
 			children = (
 				E75A9AD629261622006C6825 /* Helper.swift */,
 				E75A9AD9292618A4006C6825 /* Constant.swift */,
+				E761DA7F292CC391005F9A4D /* DataConverter.swift */,
 			);
 			path = Universal;
+			sourceTree = "<group>";
+		};
+		E761DA81292CC67F005F9A4D /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E761DA82292CC689005F9A4D /* KeyNode.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -177,11 +191,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E75A9AB82925E744006C6825 /* HomeViewController.swift in Sources */,
+				E761DA83292CC689005F9A4D /* KeyNode.swift in Sources */,
 				E75A9AD129261167006C6825 /* EditDictionaryViewController.swift in Sources */,
 				E75A9ADA292618A4006C6825 /* Constant.swift in Sources */,
 				E75A9AD329261202006C6825 /* EditDictionaryView.swift in Sources */,
 				E75A9AB42925E744006C6825 /* AppDelegate.swift in Sources */,
 				E75A9AD729261622006C6825 /* Helper.swift in Sources */,
+				E761DA80292CC391005F9A4D /* DataConverter.swift in Sources */,
 				E75A9AD529261479006C6825 /* DictionaryCell.swift in Sources */,
 				E75A9ACB29260D01006C6825 /* HomeView.swift in Sources */,
 				E75A9AB62925E744006C6825 /* SceneDelegate.swift in Sources */,

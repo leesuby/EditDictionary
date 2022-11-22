@@ -29,6 +29,10 @@ class HomeView{
         jsonData.text = """
       {
         "id": 1,
+        "Person": {
+                "name" : "Long",
+                "sex"  : "Nam"
+            },
         "title": "iPhone 9",
         "description": "An apple mobile which is nothing like apple",
         "price": 549,
@@ -44,7 +48,8 @@ class HomeView{
           "https://dummyjson.com/image/i/products/1/3.jpg",
           "https://dummyjson.com/image/i/products/1/4.jpg",
           "https://dummyjson.com/image/i/products/1/thumbnail.jpg"
-        ]
+        ],
+        "null": null
       }
 """
         

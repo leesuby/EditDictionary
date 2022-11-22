@@ -47,7 +47,7 @@ extension HomeViewController: EditDictionaryDelegate{
 
 extension HomeViewController: EditDictionaryDataSource{
     func dictionaryData() -> [String : Any] {
-        return Helper.convertToDictionary(text: (self.homeView?.jsonData.text)!)!
+        return DataConverter.convertToDictionary(text: (self.homeView?.jsonData.text)!)!
     }
     
     
