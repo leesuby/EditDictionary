@@ -10,6 +10,7 @@ import UIKit
 enum EditDataType{
     case number
     case string
+    case null
     
 }
 
@@ -80,6 +81,8 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
             }
         case .string:
             value = NSString(string: valueTextView.text)
+        case .null:
+            value = NSNull()
         case .none:
             value = nil
         }
@@ -88,15 +91,32 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
         
     }
     
-    func config(key: String, value: Any){
-        keyLabel.text = "\(key):"
+    func config(keyNode: KeyNode, value: Any){
+        keyLabel.text = generateKeyLabel(keyNode: keyNode)
         switch value{
         case is NSNumber:
             typeOfValue = .number
+        case is NSNull:
+            typeOfValue = .null
         default:
             typeOfValue = .string
         }
         valueTextView.text = String(describing: value)
+    }
+     
+    func generateKeyLabel(keyNode : KeyNode) -> String{
+        guard let parentsKey = keyNode.parent else{
+            return keyNode.key
+        }
+        var result: String = ""
+        
+        parentsKey.forEach { parent in
+            result.append("\(parent).")
+        }
+        
+        result.append(keyNode.key)
+        
+        return result
     }
     
     required init?(coder: NSCoder) {

@@ -9,7 +9,7 @@ import Foundation
 
 struct KeyNode{
     var parent: [String]?
-    var key: String?
+    var key: String = ""
     
     init(parent: [String]){
         self.parent = parent

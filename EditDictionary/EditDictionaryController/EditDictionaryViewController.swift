@@ -20,9 +20,13 @@ class EditDictionaryViewController: UIViewController {
     private var listJson : [String : Any]? {
         didSet{
             if(listJson != nil){
+                //Flatten Data
                 var tmpKeyNode : KeyNode? = nil
                 DataConverter.flattenJSONDictionary(listJson: listJson!, result: &dict, parentKey: &tmpKeyNode)
-                print(dict)
+                
+                //Convert to keys
+                keys = Array(dict.keys)
+                
             }
                 else{
                     print("You should set DataSource for EditDictionaryViewController by implement EditDictionaryDatasource")
@@ -34,8 +38,7 @@ class EditDictionaryViewController: UIViewController {
     private var dict: [KeyNode : Any] = [ : ]
     
     //Array of keys get from listJson
-    private var keys: [String]?
-    private var values: [Any]?
+    private var keys: [KeyNode]?
     
     private let searchController = UISearchController()
     private var editDictionaryView : EditDictionaryView?
@@ -104,16 +107,13 @@ extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDel
     }
     
     func getDataOnKeyword(keyword: String){
-        guard let dictionary = listJson else{
-            return
-        }
-
-        let result = dictionary.filter { (key, value) in
-            key.lowercased().contains(keyword.lowercased())
+      
+        let result = dict.filter { (keyNode, value) in
+            keyNode.key.lowercased().contains(keyword.lowercased())
         }
         
         if(keyword.isEmpty){
-            self.keys = Array(dictionary.keys)
+            self.keys = Array(dict.keys)
         }else{
             self.keys = Array(result.keys)
         }
@@ -148,7 +148,7 @@ extension EditDictionaryViewController : UICollectionViewDataSource{
         
         if let dictionCell = collectionView.dequeueReusableCell(withReuseIdentifier: "dictionaryCell", for: indexPath) as? DictionaryCell {
             
-            dictionCell.config(key: keys![indexPath.item], value: listJson?[keys![indexPath.item]] ?? "")
+            dictionCell.config(keyNode: keys![indexPath.item], value: dict[keys![indexPath.item]] ?? "")
             dictionCell.delegate = self
             cell = dictionCell
         }
@@ -163,8 +163,11 @@ extension EditDictionaryViewController : UICollectionViewDataSource{
 extension EditDictionaryViewController : UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let calculatedHeight = String(describing: listJson?[(self.keys![indexPath.item])]).height(withConstrainedWidth: collectionView.frame.size.width * 2/3, font: Constant.Text.font)
-        return CGSize(width: collectionView.frame.size.width, height: calculatedHeight + Constant.padding*2)
+        let calculatedHeightValue = String(describing: dict[keys![indexPath.item]]).height(withConstrainedWidth: collectionView.frame.size.width * 2/3, font: Constant.Text.font)
+        
+        let calculatedHeightKey = keys![indexPath.item].key.height(withConstrainedWidth: collectionView.frame.size.width * 1/3, font: Constant.Text.font)
+        
+        return CGSize(width: collectionView.frame.size.width, height: calculatedHeightKey > calculatedHeightValue ? calculatedHeightKey + Constant.padding*2 : calculatedHeightValue + Constant.padding*2)
     }
 
 }
