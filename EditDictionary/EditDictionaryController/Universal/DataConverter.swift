@@ -58,7 +58,8 @@ class DataConverter{
                     keyNodeRecursion?.parent?.append(key)
                     flattenJSONDictionary(listJson: value as! [String : Any], result: &result, parentKey: &keyNodeRecursion)
                 }
-                parentKey?.parent?.removeLast() //Vì inout sử dụng tham chiếu parentKey nên sau khi đệ quy có thể thay đổi, quay lui về remove 
+                parentKey?.parent?.removeLast()
+                //Vì inout sử dụng tham chiếu parentKey nên sau khi đệ quy có thể thay đổi, quay lui về set Default
             case is NSArray: 
                 if(parentKey != nil){
                     parentKey?.key = key
@@ -70,6 +71,9 @@ class DataConverter{
                     keyNodeResult.isArray = true
                     result[keyNodeResult] = json(from: value)
                 }
+                
+                parentKey?.isArray = false
+                //Vì inout sử dụng tham chiếu parentKey nên sau khi đệ quy có thể thay đổi, quay lui về set Default
             default:
                 if(parentKey != nil){
                     parentKey?.key = key
@@ -79,6 +83,7 @@ class DataConverter{
                     result[keyNodeResult] = value
                 }
             }
+            
         }
     }
 

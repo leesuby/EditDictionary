@@ -27,11 +27,11 @@ class EditDictionaryViewController: UIViewController {
                 //Convert to keys
                 keys = Array(dict.keys)
             }
-                else{
-                    print("You should set DataSource for EditDictionaryViewController by implement EditDictionaryDatasource")
-                }
+            else{
+                print("You should set DataSource for EditDictionaryViewController by implement EditDictionaryDatasource")
             }
         }
+    }
     
     //Dictionary after convert from Origin Data
     private var dict: [KeyNode : Any] = [ : ]
@@ -50,7 +50,7 @@ class EditDictionaryViewController: UIViewController {
         
         //Get data from Datasource
         listJson = datasource?.dictionaryData()
-      
+        
         //Init View and Constraint
         editDictionaryView = EditDictionaryView(vc: self)
         
@@ -74,7 +74,11 @@ class EditDictionaryViewController: UIViewController {
         guard listJson != nil else{
             return
         }
-    
+        
+        dict.forEach { (key: KeyNode, value: Any) in
+            print(key.key)
+            print(key.isArray)
+        }
         print(rebaseDictionary(dictionary: dict))
         
         //delegate?.changedData(data: listJson)
@@ -82,8 +86,8 @@ class EditDictionaryViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    func rebaseDictionary(dictionary d : [KeyNode : Any]) -> TreeDict{
-        var result : TreeDict = TreeDict(listDict: [])
+    func rebaseDictionary(dictionary d : [KeyNode : Any]) -> [String : Any]{
+        var treeDict : TreeDict = TreeDict(listDict: [])
         
         var alreadyCheck : [[String]?]  = []
         d.forEach { (keyNode: KeyNode, value: Any) in
@@ -94,19 +98,33 @@ class EditDictionaryViewController: UIViewController {
                     if(keyNode2.parent == keyNode.parent){
                         
                         if (keyNode2.isArray){
-                            print(keyNode2.key)
-                            let stringData : String = value as! String
+                            let stringData : String = value2 as! String
                             dictSameParent[keyNode2.key] = (stringData.toJSON()) as? NSArray
                         }else{
-                            dictSameParent[keyNode2.key] = value}
+                            dictSameParent[keyNode2.key] = value2}
                     }
                 }
-                result.listDict.append(DictNode(parent: keyNode.parent, dict: dictSameParent))
+                treeDict.listDict.append(DictNode(parent: keyNode.parent, dict: dictSameParent))
             }
             
         }
-        print(alreadyCheck)
+        
+        var result : [String : Any] = [:]
+        
+        treeDict.listDict.forEach { dictNode in
+            if(dictNode.parent == nil){
+                dictNode.dict.forEach { (key: String, value: Any) in
+                    result[key] = value
+                }
+            }else{
+                result[(dictNode.parent?.first)!] = dictNode.recursionCreateDict()
+                }
+        }
+
         return result
+    }
+    
+}
 //            alreadyCheck.append(parent)
 //            guard let parent = keyNode.parent else{
 //                if (keyNode.isArray){
@@ -121,7 +139,7 @@ class EditDictionaryViewController: UIViewController {
 //                result.listDict.append(DictNode(pa: count, dict: dict))
 //                dict = [ keyNode.key : "" ]
 //            }
-        }
+ //       }
 //        d.forEach { (keyNode: KeyNode, value: Any) in
 //            guard let parent = keyNode.parent else{
 //                if (keyNode.isArray){
@@ -149,7 +167,7 @@ class EditDictionaryViewController: UIViewController {
 //                setValueToLeaf(node: &result, keyNode: keyNode, value: value, numsParent: keyNode.parent!.count )
 //            }
 //        }
-    }
+//    }
     
 //    func setValueToLeaf(node : inout [String : Any], keyNode: KeyNode, value : Any, numsParent: Int){
 //        if(numsParent == 0){
