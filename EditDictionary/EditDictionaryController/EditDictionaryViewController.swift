@@ -8,7 +8,7 @@
 import UIKit
 
 protocol EditDictionaryDelegate : AnyObject {
-    func changedData(result: [String : Any], error : String?)
+    func changedData(result: [String : Any]?, error : String?)
 }
 
 protocol EditDictionaryDataSource : AnyObject {
@@ -75,9 +75,12 @@ class EditDictionaryViewController: UIViewController {
         guard listJson != nil else{
             return
         }
-        
-        delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
-        
+        if(self.error != nil){
+            delegate?.changedData(result: nil, error: self.error)
+        }
+        else{
+            delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
+        }
         navigationController?.popViewController(animated: true)
     }
 }
@@ -85,7 +88,6 @@ class EditDictionaryViewController: UIViewController {
 //MARK: Method to rebase and flatten json
 extension EditDictionaryViewController{
     func rebaseDictionary(dictionary d : [KeyNode : Any]) -> [String : Any]{
-        
         
         //STEP 1: GROUPING data have same family ([parent] = [parent]) -> TreeDict
         let arrayOfDictionaryHaveSameFamily : TreeDict = groupingDataSameFamily(dictionary: d)
@@ -111,10 +113,18 @@ extension EditDictionaryViewController{
                 var dictSameParent : [String : Any] = [ : ]
                 d.forEach { (keyNode2: KeyNode, value2: Any) in
                     if(keyNode2.parent == keyNode.parent){
-                        
                         if (keyNode2.isArray){
-                            let stringData : String = value2 as! String
-                            dictSameParent[keyNode2.key] = (stringData.toJSON()) as? NSArray
+                            guard let value2 = value2 as? String else{
+                                self.error = "ERROR DATATYPE: \(Helper.generateString(keyNode: keyNode2)) value can't cast to String"
+                                return
+                            }
+                            let stringData : String = value2
+                            
+                            guard let data = (stringData.toJSON()) as? NSArray else{
+                                self.error = "ERROR DATATYPE: \(Helper.generateString(keyNode: keyNode2)) value can't cast to NSArray. Please check again input JSON Array"
+                                return
+                            }
+                            dictSameParent[keyNode2.key] = data
                         }else{
                             dictSameParent[keyNode2.key] = value2}
                     }
@@ -131,6 +141,7 @@ extension EditDictionaryViewController{
         var alreadyCheckSubsetParent : [[String]] = []
         treeBaseDict.listDict.forEach { dictNode in
             guard let parentToCompare = dictNode.parent else{
+                self.error = "ERROR 100: Contact Longnct to fix this"
                 return
             }
             var flagContain: Bool = false
@@ -149,6 +160,7 @@ extension EditDictionaryViewController{
             let treeSameSubsetParent : TreeDict = TreeDict(listDict: [])
             treeBaseDict.listDict.forEach { nodeCheckSameSubsetParent in
                 guard let parentNode = nodeCheckSameSubsetParent.parent else{
+                    self.error = "ERROR 101: Contact Longnct to fix this"
                     return
                 }
                 if(Helper.checkStringContainsOrder(a: parentToCompare, b: parentNode)) {
@@ -253,7 +265,12 @@ extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDel
             return
         }
         
-        delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
+        if(self.error != nil){
+            delegate?.changedData(result: nil, error: self.error)
+        }
+        else{
+            delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
+        }
 
         //Because there is 2 ViewController : Edit + Search
         navigationController?.popViewController(animated: true)

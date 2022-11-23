@@ -86,6 +86,8 @@ class DictionaryCell: UICollectionViewCell{
     }
 }
 
+
+//MARK: TextView Delegate
 extension DictionaryCell: UITextViewDelegate{
     func textViewDidChange(_ textView: UITextView) {
         //Valid JSON datatypes: number, string, array(String), bool -> __NSCFNumber, __NSCFString
