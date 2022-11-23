@@ -68,7 +68,7 @@ class HomeView{
               },
                                       "Long":
                                           {
-"Name" : 12121313,
+                                            "Name" : 12121313,
                                       "batter":
                                           [
                                               { "id": "1001", "type": "Regular" },
@@ -77,7 +77,9 @@ class HomeView{
                                               { "id": "1004", "type": "Devil's Food" }
                                           ]
 
-},"muahahaha" : 122121212,"onononono" : "123123123123123"
+                                        },
+        "muahahaha" : 122121212,
+        "onononono" : "123123123123123"
       }
 """
         

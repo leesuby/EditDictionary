@@ -27,6 +27,13 @@ class DataConverter{
         return nil
     }
     
+    static func json(from object:Any) -> String? {
+        guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else {
+            return nil
+        }
+        return String(data: data, encoding: String.Encoding.utf8)
+    }
+    
     //Using to convert dictionary and cast data to datatype of Json (__NSCFNumber, __NSCFString...)
     static func convertToJsonData(dic: [String : Any], completion : @escaping ([String : Any]) -> ()){
         do {
@@ -87,10 +94,5 @@ class DataConverter{
         }
     }
 
-    static func json(from object:Any) -> String? {
-        guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else {
-            return nil
-        }
-        return String(data: data, encoding: String.Encoding.utf8)
-    }
+    
 }

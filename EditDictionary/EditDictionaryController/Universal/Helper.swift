@@ -23,6 +23,18 @@ class Helper{
         
         return result
     }
+    
+    static func checkStringContainsOrder(a: [String], b: [String]) -> Bool{
+        let minimumCount : Int = a.count >= b.count ? b.count : a.count
+        
+        for i in 0..<minimumCount{
+            if(!a[i].elementsEqual(b[i])){
+                return false
+            }
+        }
+        return true
+    }
+
 }
 extension String {
     func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
@@ -79,5 +91,6 @@ extension String {
         guard let data = self.data(using: .utf8, allowLossyConversion: false) else { return nil }
         return try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
     }
-
+    
+   
 }

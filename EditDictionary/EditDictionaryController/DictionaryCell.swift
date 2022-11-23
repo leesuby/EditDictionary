@@ -16,9 +16,10 @@ enum EditDataType{
 
 protocol DictionaryCellDelegate{
     func textViewDidChange(keyNode: KeyNode, value: Any)
+    func raiseError(error: String)
 }
 
-class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
+class DictionaryCell: UICollectionViewCell{
     
     var itemsNumber : Int?
     private var keyLabel : UILabel!
@@ -66,6 +67,26 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
         
     }
     
+    func config(keyNode: KeyNode, value: Any){
+        keyLabel.text = Helper.generateString(keyNode: keyNode)
+        self.keyNode = keyNode
+        switch value{
+        case is NSNumber:
+            typeOfValue = .number
+        case is NSNull:
+            typeOfValue = .null
+        default:
+            typeOfValue = .string
+        }
+        valueTextView.text = String(describing: value)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("Error while create DictionaryCell")
+    }
+}
+
+extension DictionaryCell: UITextViewDelegate{
     func textViewDidChange(_ textView: UITextView) {
         //Valid JSON datatypes: number, string, array(String), bool -> __NSCFNumber, __NSCFString
         let value : Any!
@@ -86,7 +107,7 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
                 value = NSString(string: valueTextView.text)}
             
         case .null:
-            // Case: Ban đầu là Null nhưng sau đó chỉnh sửa thành số hay chữ khác.
+            // Case: Beginning is Null but after that they change to different type
             if(valueTextView.text.isDouble()){
                 value = NSNumber(value: Double(valueTextView.text) ?? 0)
             }
@@ -100,22 +121,34 @@ class DictionaryCell: UICollectionViewCell, UITextViewDelegate {
         
     }
     
-    func config(keyNode: KeyNode, value: Any){
-        keyLabel.text = Helper.generateString(keyNode: keyNode)
-        self.keyNode = keyNode
-        switch value{
-        case is NSNumber:
-            typeOfValue = .number
-        case is NSNull:
-            typeOfValue = .null
-        default:
-            typeOfValue = .string
+    //Handle textView for input only number if type is number
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if(typeOfValue == .number){
+            let inverseSet = NSCharacterSet(charactersIn:"0123456789").inverted
+
+                let components = text.components(separatedBy: inverseSet)
+
+                let filtered = components.joined(separator: "")
+
+                if filtered == text {
+                    return true
+                } else {
+                    if text == "." {
+                        let countdots = textView.text!.components(separatedBy:".").count - 1
+                        if countdots == 0 {
+                            return true
+                        }else{
+                            if countdots > 0 && text == "." {
+                                return false
+                            } else {
+                                return true
+                            }
+                        }
+                    }else{
+                        return false
+                    }
+                }
         }
-        valueTextView.text = String(describing: value)
+        return true
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Error while create DictionaryCell")
-    }
-    
 }

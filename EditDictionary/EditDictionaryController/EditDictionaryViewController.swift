@@ -8,7 +8,7 @@
 import UIKit
 
 protocol EditDictionaryDelegate : AnyObject {
-    func changedData(data: [String : Any]?)
+    func changedData(result: [String : Any], error : String?)
 }
 
 protocol EditDictionaryDataSource : AnyObject {
@@ -16,6 +16,7 @@ protocol EditDictionaryDataSource : AnyObject {
 }
 
 class EditDictionaryViewController: UIViewController {
+    private var error : String?
     //Origin Data get From Another Controller
     private var listJson : [String : Any]? {
         didSet{
@@ -28,7 +29,7 @@ class EditDictionaryViewController: UIViewController {
                 keys = Array(dict.keys)
             }
             else{
-                print("You should set DataSource for EditDictionaryViewController by implement EditDictionaryDatasource")
+                error = "DATASOURCE NOT FOUND: EditDictionaryDatasource is not conform"
             }
         }
     }
@@ -75,24 +76,37 @@ class EditDictionaryViewController: UIViewController {
             return
         }
         
-        dict.forEach { (key: KeyNode, value: Any) in
-            print(key.key)
-            print(key.isArray)
-        }
-        print(rebaseDictionary(dictionary: dict))
-        
-        //delegate?.changedData(data: listJson)
+        delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
         
         navigationController?.popViewController(animated: true)
     }
-    
+}
+
+//MARK: Method to rebase and flatten json
+extension EditDictionaryViewController{
     func rebaseDictionary(dictionary d : [KeyNode : Any]) -> [String : Any]{
         
-        var treeBaseDict : TreeDict = TreeDict(listDict: [])
+        
+        //STEP 1: GROUPING data have same family ([parent] = [parent]) -> TreeDict
+        let arrayOfDictionaryHaveSameFamily : TreeDict = groupingDataSameFamily(dictionary: d)
+        
+        //STEP 2: GROUPING data have same subset family set ([parent] containt order [parent]) -> [TreeDict]
+        let arrayOfArrayOfDictionaryHaveSameParentSubset : [TreeDict] = groupingDataSameParentSubset(treeBaseDict: arrayOfDictionaryHaveSameFamily)
+        
+        //STEP 3: GENERATE array of Dictionary from GROUPED data
+        let arrayOfDictionaryResult : [[String: Any]] = generateDictionaryFromGroupedData(groupedData: arrayOfArrayOfDictionaryHaveSameParentSubset)
+        
+        //STEP 4: GET Result
+        let result : [String : Any] = convertArrayDictionaryToDictionary(arrayDictionnary: arrayOfDictionaryResult, arrayDataHaveSameFamily: arrayOfDictionaryHaveSameFamily)
+        
+        return result
+    }
+    
+    func groupingDataSameFamily(dictionary d : [KeyNode : Any]) -> TreeDict{
+        let treeBaseDict : TreeDict = TreeDict(listDict: [])
         var alreadyCheckParent : [[String]?]  = []
         d.forEach { (keyNode: KeyNode, value: Any) in
             if !alreadyCheckParent.contains(keyNode.parent){
-                print(alreadyCheckParent)
                 alreadyCheckParent.append(keyNode.parent)
                 var dictSameParent : [String : Any] = [ : ]
                 d.forEach { (keyNode2: KeyNode, value2: Any) in
@@ -109,20 +123,10 @@ class EditDictionaryViewController: UIViewController {
             }
             
         }
-        
-        
-//        var result : [String : Any] = [:]
-
-//        treeBaseDict.listDict.forEach { dictNode in
-//            if(dictNode.parent == nil){
-//                dictNode.dict.forEach { (key: String, value: Any) in
-//                    result[key] = value
-//                }
-//            }else{
-//                result[(dictNode.parent?.first)!] = dictNode.recursionCreateDict()
-//                }
-//        }
-        
+        return treeBaseDict
+    }
+    
+    func groupingDataSameParentSubset(treeBaseDict: TreeDict) -> [TreeDict]{
         var listTreeDictSameSubsetParent : [TreeDict] = []
         var alreadyCheckSubsetParent : [[String]] = []
         treeBaseDict.listDict.forEach { dictNode in
@@ -131,7 +135,7 @@ class EditDictionaryViewController: UIViewController {
             }
             var flagContain: Bool = false
             alreadyCheckSubsetParent.forEach { parent in
-                if(checkStringContainsOrder(a: parentToCompare, b: parent)){
+                if(Helper.checkStringContainsOrder(a: parentToCompare, b: parent)){
                     flagContain = true
                 }
             }
@@ -147,29 +151,31 @@ class EditDictionaryViewController: UIViewController {
                 guard let parentNode = nodeCheckSameSubsetParent.parent else{
                     return
                 }
-                if(checkStringContainsOrder(a: parentToCompare, b: parentNode)) {
+                if(Helper.checkStringContainsOrder(a: parentToCompare, b: parentNode)) {
                     treeSameSubsetParent.listDict.append(nodeCheckSameSubsetParent)
                 }
             }
             listTreeDictSameSubsetParent.append(treeSameSubsetParent)
         }
-        
-        
-        
+        return listTreeDictSameSubsetParent
+    }
+    
+    func generateDictionaryFromGroupedData(groupedData: [TreeDict]) -> [[String : Any]]{
         var listFinalDict : [[String : Any]] = [[:]]
-        listTreeDictSameSubsetParent.forEach { treeDict in
-            print("------------------")
+        groupedData.forEach { treeDict in
             var baseList: [String : Any] = [ : ]
             treeDict.recursionCreateDict(result: &baseList, parentMaxLength: treeDict.getMaxLengthParent())
-            var mergedDict : DictNode = treeDict.listDict.min { a, b in
+            let mergedDict : DictNode = treeDict.listDict.min { a, b in
                 a.parent!.count <= b.parent!.count
             }!
             listFinalDict.append(finalDict(baseDict: &baseList,leafDict: mergedDict.dict, parent: mergedDict.parent!))
         }
-        
-        
+        return listFinalDict
+    }
+    
+    func convertArrayDictionaryToDictionary(arrayDictionnary : [[String: Any]], arrayDataHaveSameFamily : TreeDict) -> [String : Any]{
         var result : [String : Any] = [:]
-        listFinalDict.forEach { dict in
+        arrayDictionnary.forEach { dict in
             let keys = Array(dict.keys)
             if keys.isEmpty{
                 return
@@ -177,18 +183,16 @@ class EditDictionaryViewController: UIViewController {
             result[keys[0]] = dict[keys[0]]
         }
         
-        treeBaseDict.listDict.forEach { dictNode in
+        arrayDataHaveSameFamily.listDict.forEach { dictNode in
             if(dictNode.parent == nil){
                 dictNode.dict.forEach { (key: String, value: Any) in
                     result[key] = value
                 }
             }
         }
-        
-        
-
         return result
     }
+    
     @discardableResult
     func finalDict(baseDict : inout [String:Any], leafDict : [String : Any],parent: [String], iterator: Int = 0) -> [String : Any]{
         if(parent.count == iterator){
@@ -200,89 +204,15 @@ class EditDictionaryViewController: UIViewController {
         }
         
     }
-    
-    func checkStringContainsOrder(a: [String], b: [String]) -> Bool{
-        let minimumCount : Int = a.count >= b.count ? b.count : a.count
-        for i in 0..<minimumCount{
-            if(!a[i].elementsEqual(b[i])){
-                return false
-            }
-        }
-        return true
-    }
-    
 }
-//            alreadyCheck.append(parent)
-//            guard let parent = keyNode.parent else{
-//                if (keyNode.isArray){
-//                    let stringData : String = value as! String
-//                    dict[keyNode.key] = (stringData.toJSON()) as? NSArray
-//                }else{
-//                    dict[keyNode.key] = value}
-//                return
-//            }
-//            if(!parent.isEmpty){
-//                count = count + 1
-//                result.listDict.append(DictNode(pa: count, dict: dict))
-//                dict = [ keyNode.key : "" ]
-//            }
- //       }
-//        d.forEach { (keyNode: KeyNode, value: Any) in
-//            guard let parent = keyNode.parent else{
-//                if (keyNode.isArray){
-//                    let stringData : String = value as! String
-//                    result[keyNode.key] = (stringData.toJSON()) as? NSArray
-//                }else{
-//                    result[keyNode.key] = value}
-//                return
-//            }
-//            if(!parent.isEmpty){
-//                setValueToLeaf(node: &result, keyNode: keyNode, value: value, numsParent: keyNode.parent!.count )
-//            }
-//        }
-//        var result : [String : Any] = [ : ]
-//        d.forEach { (keyNode: KeyNode, value: Any) in
-//            guard let parent = keyNode.parent else{
-//                if (keyNode.isArray){
-//                    let stringData : String = value as! String
-//                    result[keyNode.key] = (stringData.toJSON()) as? NSArray
-//                }else{
-//                    result[keyNode.key] = value}
-//                return
-//            }
-//            if(!parent.isEmpty){
-//                setValueToLeaf(node: &result, keyNode: keyNode, value: value, numsParent: keyNode.parent!.count )
-//            }
-//        }
-//    }
-
-//class MyDict {
-//    var key: String
-//    var value: Any
-//}
-//
-//func setValue(node: inout MyDict) {
-//    setValue(node: &(node.value as! MyDict))
-//}
-
-//func getValueToLeaf(node : inout [String : Any], keyNode: KeyNode, value : Any, numsParent: Int) -> Any {
-//    let parentKey : String = keyNode.parent![keyNode.parent!.count - numsParent]
-//    var res = [String: Any]()
-//    if numsParent == 0 {
-//        res[parentKey] = value
-//    } else {
-//        let value = getValueToLeaf(node: &dict, keyNode: keyNode, value: value, numsParent: numsParent - 1)
-//        res[parentKey] = value
-//    }
-//        return res
-//    }
-   
-
-
 
 
 //MARK: Cell Delegate
 extension EditDictionaryViewController : DictionaryCellDelegate {
+    func raiseError(error: String) {
+        self.error = error
+    }
+    
     func textViewDidChange(keyNode: KeyNode, value: Any) {
         dict[keyNode] = value
     }
@@ -319,11 +249,11 @@ extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDel
     
     //Save data
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        guard let dictionary = listJson else{
+        guard listJson != nil else{
             return
         }
         
-        delegate?.changedData(data: dictionary)
+        delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
 
         //Because there is 2 ViewController : Edit + Search
         navigationController?.popViewController(animated: true)
