@@ -37,7 +37,8 @@ class HomeView{
                               "name": "Cake",
                               "ppu": 0.55,
                               "batters":
-                                  {
+                                  {"haha" : 1213,
+                                    "id" : 123123123123123123123,
                                       "batter":
                                           [
                                               { "id": "1001", "type": "Regular" },
@@ -55,9 +56,28 @@ class HomeView{
                                       { "id": "5006", "type": "Chocolate with Sprinkles" },
                                       { "id": "5003", "type": "Chocolate" },
                                       { "id": "5004", "type": "Maple" }
-                                  ]
+                                  ],
+                                      "batter":
+                                          [
+                                              { "id": "1001", "type": "Regular" },
+                                              { "id": "1002", "type": "Chocolate" },
+                                              { "id": "1003", "type": "Blueberry" },
+                                              { "id": "1004", "type": "Devil's Food" }
+                                          ]
                           }
-              }
+              },
+                                      "Long":
+                                          {
+"Name" : 12121313,
+                                      "batter":
+                                          [
+                                              { "id": "1001", "type": "Regular" },
+                                              { "id": "1002", "type": "Chocolate" },
+                                              { "id": "1003", "type": "Blueberry" },
+                                              { "id": "1004", "type": "Devil's Food" }
+                                          ]
+
+},"muahahaha" : 122121212,"onononono" : "123123123123123"
       }
 """
         

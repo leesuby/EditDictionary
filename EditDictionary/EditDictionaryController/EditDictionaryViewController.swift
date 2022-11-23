@@ -87,12 +87,13 @@ class EditDictionaryViewController: UIViewController {
     }
     
     func rebaseDictionary(dictionary d : [KeyNode : Any]) -> [String : Any]{
-        var treeDict : TreeDict = TreeDict(listDict: [])
         
-        var alreadyCheck : [[String]?]  = []
+        var treeBaseDict : TreeDict = TreeDict(listDict: [])
+        var alreadyCheckParent : [[String]?]  = []
         d.forEach { (keyNode: KeyNode, value: Any) in
-            if !alreadyCheck.contains(keyNode.parent){
-                alreadyCheck.append(keyNode.parent)
+            if !alreadyCheckParent.contains(keyNode.parent){
+                print(alreadyCheckParent)
+                alreadyCheckParent.append(keyNode.parent)
                 var dictSameParent : [String : Any] = [ : ]
                 d.forEach { (keyNode2: KeyNode, value2: Any) in
                     if(keyNode2.parent == keyNode.parent){
@@ -104,24 +105,110 @@ class EditDictionaryViewController: UIViewController {
                             dictSameParent[keyNode2.key] = value2}
                     }
                 }
-                treeDict.listDict.append(DictNode(parent: keyNode.parent, dict: dictSameParent))
+                treeBaseDict.listDict.append(DictNode(parent: keyNode.parent, dict: dictSameParent))
             }
             
         }
         
-        var result : [String : Any] = [:]
         
-        treeDict.listDict.forEach { dictNode in
+//        var result : [String : Any] = [:]
+
+//        treeBaseDict.listDict.forEach { dictNode in
+//            if(dictNode.parent == nil){
+//                dictNode.dict.forEach { (key: String, value: Any) in
+//                    result[key] = value
+//                }
+//            }else{
+//                result[(dictNode.parent?.first)!] = dictNode.recursionCreateDict()
+//                }
+//        }
+        
+        var listTreeDictSameSubsetParent : [TreeDict] = []
+        var alreadyCheckSubsetParent : [[String]] = []
+        treeBaseDict.listDict.forEach { dictNode in
+            guard let parentToCompare = dictNode.parent else{
+                return
+            }
+            var flagContain: Bool = false
+            alreadyCheckSubsetParent.forEach { parent in
+                if(checkStringContainsOrder(a: parentToCompare, b: parent)){
+                    flagContain = true
+                }
+            }
+            
+            if(flagContain){
+                return
+            }
+            
+            alreadyCheckSubsetParent.append(parentToCompare)
+            
+            let treeSameSubsetParent : TreeDict = TreeDict(listDict: [])
+            treeBaseDict.listDict.forEach { nodeCheckSameSubsetParent in
+                guard let parentNode = nodeCheckSameSubsetParent.parent else{
+                    return
+                }
+                if(checkStringContainsOrder(a: parentToCompare, b: parentNode)) {
+                    treeSameSubsetParent.listDict.append(nodeCheckSameSubsetParent)
+                }
+            }
+            listTreeDictSameSubsetParent.append(treeSameSubsetParent)
+        }
+        
+        
+        
+        var listFinalDict : [[String : Any]] = [[:]]
+        listTreeDictSameSubsetParent.forEach { treeDict in
+            print("------------------")
+            var baseList: [String : Any] = [ : ]
+            treeDict.recursionCreateDict(result: &baseList, parentMaxLength: treeDict.getMaxLengthParent())
+            var mergedDict : DictNode = treeDict.listDict.min { a, b in
+                a.parent!.count <= b.parent!.count
+            }!
+            listFinalDict.append(finalDict(baseDict: &baseList,leafDict: mergedDict.dict, parent: mergedDict.parent!))
+        }
+        
+        
+        var result : [String : Any] = [:]
+        listFinalDict.forEach { dict in
+            let keys = Array(dict.keys)
+            if keys.isEmpty{
+                return
+            }
+            result[keys[0]] = dict[keys[0]]
+        }
+        
+        treeBaseDict.listDict.forEach { dictNode in
             if(dictNode.parent == nil){
                 dictNode.dict.forEach { (key: String, value: Any) in
                     result[key] = value
                 }
-            }else{
-                result[(dictNode.parent?.first)!] = dictNode.recursionCreateDict()
-                }
+            }
         }
+        
+        
 
         return result
+    }
+    @discardableResult
+    func finalDict(baseDict : inout [String:Any], leafDict : [String : Any],parent: [String], iterator: Int = 0) -> [String : Any]{
+        if(parent.count == iterator){
+            return leafDict
+        }else{
+            var resultDict: [String : Any] = [:]
+            resultDict[parent[iterator]] = finalDict(baseDict: &resultDict, leafDict: leafDict, parent: parent, iterator: iterator + 1)
+            return resultDict
+        }
+        
+    }
+    
+    func checkStringContainsOrder(a: [String], b: [String]) -> Bool{
+        let minimumCount : Int = a.count >= b.count ? b.count : a.count
+        for i in 0..<minimumCount{
+            if(!a[i].elementsEqual(b[i])){
+                return false
+            }
+        }
+        return true
     }
     
 }
@@ -168,15 +255,26 @@ class EditDictionaryViewController: UIViewController {
 //            }
 //        }
 //    }
-    
-//    func setValueToLeaf(node : inout [String : Any], keyNode: KeyNode, value : Any, numsParent: Int){
-//        if(numsParent == 0){
-//            node[keyNode.key] = value
-//        }else{
-//            let parentKey : String = keyNode.parent![keyNode.parent!.count - numsParent]
-//            node[parentKey] as! [String : Any]
-//            setValueToLeaf(node: &node[parentKey], keyNode: keyNode, value: value, numsParent: numsParent - 1)
-//        }
+
+//class MyDict {
+//    var key: String
+//    var value: Any
+//}
+//
+//func setValue(node: inout MyDict) {
+//    setValue(node: &(node.value as! MyDict))
+//}
+
+//func getValueToLeaf(node : inout [String : Any], keyNode: KeyNode, value : Any, numsParent: Int) -> Any {
+//    let parentKey : String = keyNode.parent![keyNode.parent!.count - numsParent]
+//    var res = [String: Any]()
+//    if numsParent == 0 {
+//        res[parentKey] = value
+//    } else {
+//        let value = getValueToLeaf(node: &dict, keyNode: keyNode, value: value, numsParent: numsParent - 1)
+//        res[parentKey] = value
+//    }
+//        return res
 //    }
    
 
