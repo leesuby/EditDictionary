@@ -92,7 +92,7 @@ extension EditDictionaryViewController{
         //STEP 1: GROUPING data have same family ([parent] = [parent]) -> TreeDict
         let arrayOfDictionaryHaveSameFamily : TreeDict = groupingDataSameFamily(dictionary: d)
         
-        //STEP 2: GROUPING data have same subset family set ([parent] containt order [parent]) -> [TreeDict]
+        //STEP 2: GROUPING data have same subset family set ([parent] containt ORDER [parent]) -> [TreeDict]
         let arrayOfArrayOfDictionaryHaveSameParentSubset : [TreeDict] = groupingDataSameParentSubset(treeBaseDict: arrayOfDictionaryHaveSameFamily)
         
         //STEP 3: GENERATE array of Dictionary from GROUPED data
