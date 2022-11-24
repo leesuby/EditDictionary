@@ -26,25 +26,49 @@ class HomeView{
         jsonData.font = Constant.Text.font
         jsonData.numberOfLines = 0
         jsonData.textColor = Constant.Text.color
-        jsonData.text = """
+        jsonData.text =         """
       {
           "items":
               {
-                "Long" : {
-                    "Name" : "longnct"
-                },
-                "An" : {
-                    "Name" : "annct",
-                    "test" : {
-                                "Long" : {
-                                    "Name" : "longnct"
-                                },
-                                "An" : {
-                                    "Name" : "annct"
-
-                                }
-                    }
-                }
+                  "item":
+                          {
+                              "id": "0001",
+                              "type": "donut",
+                              "name": "Cake",
+                              "ppu": 0.55,
+                              "batters":
+                                  {"haha" : 1213,
+                                    "id" : 123123123123123123123,
+                                    "batter":
+                                          [
+                                              { "id": "1001", "type": "Regular" },
+                                              { "id": "1002", "type": "Chocolate" },
+                                              { "id": "1003", "type": "Blueberry" },
+                                              { "id": "1004", "type": "Devil's Food" }
+                                          ],
+                                    "long": {
+                                        "name" : "long",
+                                        "aasdasd" : "asdasda"
+                                    }
+                                  },
+                              "topping":
+                                  [
+                                      { "id": "5001", "type": "None" },
+                                      { "id": "5002", "type": "Glazed" },
+                                      { "id": "5005", "type": "Sugar" },
+                                      { "id": "5007", "type": "Powdered Sugar" },
+                                      { "id": "5006", "type": "Chocolate with Sprinkles" },
+                                      { "id": "5003", "type": "Chocolate" },
+                                      { "id": "5004", "type": "Maple" }
+                                  ],
+                                      "batter":
+                                          [
+                                              { "id": "1001", "type": "Regular" },
+                                              { "id": "1002", "type": "Chocolate" },
+                                              { "id": "1003", "type": "Blueberry" },
+                                              { "id": "1004", "type": "Devil's Food" }
+                                          ]
+                          }
               },
         "Long":
                 {
@@ -62,6 +86,43 @@ class HomeView{
         "onononono" : "123123123123123"
       }
 """
+
+//        jsonData.text = """
+//      {
+//          "items":
+//              {
+//                "Long" : {
+//                    "Name" : "longnct"
+//                },
+//                "An" : {
+//                    "Name" : "annct",
+//                    "test" : {
+//                                "Long" : {
+//                                    "Name" : "longnct"
+//                                },
+//                                "An" : {
+//                                    "Name" : "annct"
+//
+//                                }
+//                    }
+//                }
+//              },
+//        "Long":
+//                {
+//                    "Name" : 12121313,
+//                    "batter":
+//                        [
+//                            { "id": "1001", "type": "Regular" },
+//                            { "id": "1002", "type": "Chocolate" },
+//                            { "id": "1003", "type": "Blueberry" },
+//                            { "id": "1004", "type": "Devil's Food" }
+//                        ]
+//
+//                    },
+//        "muahahaha" : 122121212,
+//        "onononono" : "123123123123123"
+//      }
+//"""
         
         
     }
