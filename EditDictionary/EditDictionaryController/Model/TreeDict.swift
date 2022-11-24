@@ -30,42 +30,43 @@ class TreeDict{
         return parentMax
     }
     
-    func getListByLengthParent(length: Int) -> [DictNode]{
-        var result : [DictNode] = []
+    func getDictByLengthParent(length: Int) -> DictNode?{
+        var result : DictNode? = nil
         listDict.forEach { dictNode in
             guard let parent = dictNode.parent else{
                 return
             }
             if(parent.count == length){
-                result.append(dictNode)
+                result = dictNode
             }
         }
         return result
     }
     
     @discardableResult
-    func recursionCreateDict(result: inout [String : Any] ,iterator: Int = 0, parentMaxLength: [String]) -> [String : Any]{
+    func recursionCreateDict(iterator: Int = 1, parentMaxLength: [String]) -> [String : Any]{
+        var resultRecursion: [String : Any] = [:]
         
         if(iterator == parentMaxLength.count){
-            return result
+            let dictByLength = getDictByLengthParent(length: iterator)
+            resultRecursion[parentMaxLength[iterator - 1]] = dictByLength!.dict
         }
         else{
-            var resultRecursion: [String : Any] = [:]
-            let listByLength = getListByLengthParent(length: iterator + 1)
-            if(listByLength.isEmpty){
-                resultRecursion[parentMaxLength[iterator]] = recursionCreateDict(result: &resultRecursion,iterator: iterator + 1, parentMaxLength: parentMaxLength)
+            let dictByLength = getDictByLengthParent(length: iterator)
+            if(dictByLength == nil){
+                resultRecursion[parentMaxLength[iterator - 1]] = recursionCreateDict(iterator: iterator + 1, parentMaxLength: parentMaxLength)
             }else{
-                listByLength.forEach { dictNode in
-                    guard dictNode.parent != nil else{
-                        resultRecursion = dictNode.dict
-                        return
-                    }
-                    result[parentMaxLength[iterator]] = recursionCreateDict(result: &dictNode.dict,iterator: iterator + 1, parentMaxLength: parentMaxLength)
+                let copyDict : DictNode = dictByLength!
+                copyDict.dict.merge(recursionCreateDict(iterator: iterator + 1, parentMaxLength: parentMaxLength)) { (current, _) in
+                    current
                 }
+                resultRecursion[parentMaxLength[iterator - 1]] = copyDict.dict
             }
-            return resultRecursion
         }
+        return resultRecursion
     }
     
     
 }
+
+

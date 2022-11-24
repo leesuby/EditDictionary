@@ -38,7 +38,11 @@ class HomeViewController: UIViewController{
 
 extension HomeViewController: EditDictionaryDelegate{
     func changedData(result: [String : Any]?, error: String?) {
-        print(result)
+        result?.forEach({ (key: String, value: Any) in
+//            print("---------")
+//            print(key)
+//            print(value)
+        })
     }
 }
 

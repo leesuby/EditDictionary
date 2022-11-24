@@ -88,6 +88,7 @@ class EditDictionaryViewController: UIViewController {
 //MARK: Method to rebase and flatten json
 extension EditDictionaryViewController{
     func rebaseDictionary(dictionary d : [KeyNode : Any]) -> [String : Any]{
+
         
         //STEP 1: GROUPING data have same family ([parent] = [parent]) -> TreeDict
         let arrayOfDictionaryHaveSameFamily : TreeDict = groupingDataSameFamily(dictionary: d)
@@ -175,18 +176,15 @@ extension EditDictionaryViewController{
     func generateDictionaryFromGroupedData(groupedData: [TreeDict]) -> [[String : Any]]{
         var listFinalDict : [[String : Any]] = [[:]]
         groupedData.forEach { treeDict in
-            var baseList: [String : Any] = [ : ]
-            treeDict.recursionCreateDict(result: &baseList, parentMaxLength: treeDict.getMaxLengthParent())
-            let mergedDict : DictNode = treeDict.listDict.min { a, b in
-                a.parent!.count <= b.parent!.count
-            }!
-            listFinalDict.append(finalDict(baseDict: &baseList,leafDict: mergedDict.dict, parent: mergedDict.parent!))
+            let dictMerge : [String : Any] = treeDict.recursionCreateDict(parentMaxLength: treeDict.getMaxLengthParent())
+            listFinalDict.append(dictMerge)
         }
         return listFinalDict
     }
     
     func convertArrayDictionaryToDictionary(arrayDictionnary : [[String: Any]], arrayDataHaveSameFamily : TreeDict) -> [String : Any]{
         var result : [String : Any] = [:]
+        
         arrayDictionnary.forEach { dict in
             let keys = Array(dict.keys)
             if keys.isEmpty{

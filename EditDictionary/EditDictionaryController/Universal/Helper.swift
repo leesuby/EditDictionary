@@ -32,6 +32,9 @@ class Helper{
                 return false
             }
         }
+        print("----------------------")
+        print(a)
+        print(b)
         return true
     }
 
