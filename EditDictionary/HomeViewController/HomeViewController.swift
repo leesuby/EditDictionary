@@ -10,6 +10,7 @@ import UIKit
 //Using for Testing
 class HomeViewController: UIViewController{
     private var homeView : HomeView?
+    private var originData : [String : Any]!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,17 +39,14 @@ class HomeViewController: UIViewController{
 
 extension HomeViewController: EditDictionaryDelegate{
     func changedData(result: [String : Any]?, error: String?) {
-        result?.forEach({ (key: String, value: Any) in
-//            print("---------")
-//            print(key)
-//            print(value)
-        })
+        print(result)
     }
 }
 
 extension HomeViewController: EditDictionaryDataSource{
     func dictionaryData() -> [String : Any] {
-        return DataConverter.convertToDictionary(text: (self.homeView?.jsonData.text)!)!
+        originData = DataConverter.convertToDictionary(text: (self.homeView?.jsonData.text)!)!
+        return originData
     }
     
     
