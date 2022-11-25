@@ -26,7 +26,7 @@ extension Dictionary where Key : StringProtocol{
             case let (head, remainingKeyPath)? where remainingKeyPath.isEmpty:
                 // Reached the end of the key path.
                 let key = Key(string: head)
-                return self[key]
+                return self[key] as Any
             case let (head, remainingKeyPath)?:
                 // Key path has a tail we need to traverse.
                 let key = Key(string: head)
