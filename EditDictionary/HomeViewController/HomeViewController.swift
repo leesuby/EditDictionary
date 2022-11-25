@@ -39,6 +39,7 @@ class HomeViewController: UIViewController{
 
 extension HomeViewController: EditDictionaryDelegate{
     func changedData(result: [String : Any]?, error: String?) {
+        print(error)
         print(result)
     }
 }

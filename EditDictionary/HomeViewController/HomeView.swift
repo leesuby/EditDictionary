@@ -52,7 +52,25 @@ class HomeView{
                                     },
                                     "an": {
                                         "name":  "an"
+                                    },
+                              "batters":
+                                  {"haha" : 1213,
+                                    "id" : 123123123123123123123,
+                                    "batter":
+                                          [
+                                              { "id": "1001", "type": "Regular" },
+                                              { "id": "1002", "type": "Chocolate" },
+                                              { "id": "1003", "type": "Blueberry" },
+                                              { "id": "1004", "type": "Devil's Food" }
+                                          ],
+                                    "long": {
+                                        "name" : "long",
+                                        "aasdasd" : "asdasda"
+                                    },
+                                    "an": {
+                                        "name":  "an"
                                     }
+                                  }
                                   },
                               "topping":
                                   [

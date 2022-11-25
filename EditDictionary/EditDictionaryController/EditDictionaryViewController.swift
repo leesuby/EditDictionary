@@ -79,7 +79,8 @@ class EditDictionaryViewController: UIViewController {
             delegate?.changedData(result: nil, error: self.error)
         }
         else{
-            delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
+            updateJSON(dictionary: dict)
+            delegate?.changedData(result: self.listJson, error: self.error)
         }
         navigationController?.popViewController(animated: true)
     }
@@ -135,7 +136,8 @@ extension EditDictionaryViewController : UISearchResultsUpdating, UISearchBarDel
             delegate?.changedData(result: nil, error: self.error)
         }
         else{
-            delegate?.changedData(result: rebaseDictionary(dictionary: dict), error: self.error)
+            updateJSON(dictionary: dict)
+            delegate?.changedData(result: listJson, error: self.error)
         }
         
         //Because there is 2 ViewController : Edit + Search
@@ -181,10 +183,34 @@ extension EditDictionaryViewController : UICollectionViewDelegateFlowLayout{
     
 }
 
+//MARK: Update JSON
+extension EditDictionaryViewController{
+    func updateJSON(dictionary d : [KeyNode : Any]){
+        d.forEach { (keyNode: KeyNode, value: Any) in
+            let keyPaths : KeyPath = KeyPath(Helper.generateString(keyNode: keyNode))
+            if (keyNode.isArray){
+                guard let value = value as? String else{
+                    self.error = "ERROR DATATYPE: \(Helper.generateString(keyNode: keyNode)) value can't cast to String"
+                    return
+                }
+                let stringData : String = value
+                
+                guard let data = (stringData.toJSON()) as? NSArray else{
+                    self.error = "ERROR DATATYPE: \(Helper.generateString(keyNode: keyNode)) value can't cast to NSArray. Please check again input JSON Array"
+                    return
+                }
+                self.listJson![keyPath: keyPaths] = data
+            }else{
+                self.listJson![keyPath: keyPaths] = value}
+        }
+    }
+}
+
 //MARK: Method to REBASE and FLATTEN json
 extension EditDictionaryViewController{
     //MARK: FLATTEN data
     func flattenJSONDictionary(listJson: [String : Any], result: inout [KeyNode: Any], parentKey: inout KeyNode?){
+        
         listJson.forEach { (key: String, value: Any) in
             switch value{
             case is NSDictionary: //(JSON type)
@@ -192,7 +218,6 @@ extension EditDictionaryViewController{
                     parentKey?.parent?.append(key)
                     var keyRecursion : KeyNode? = KeyNode(parent: (parentKey?.parent)!)
                     flattenJSONDictionary(listJson: value as! [String : Any], result: &result, parentKey: &keyRecursion)
-                    
                 }
                 else{
                     var keyNodeRecursion : KeyNode? = KeyNode(parent: [])
