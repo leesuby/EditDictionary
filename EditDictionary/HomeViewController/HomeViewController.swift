@@ -38,17 +38,17 @@ class HomeViewController: UIViewController{
 
 
 extension HomeViewController: EditDictionaryDelegate{
-    func changedData(result: [String : Any]?, error: String?) {
+    func editDictionary(resultAfterEdit result: [String : Any]?, error: String?) {
         print(error)
         print(result)
     }
+    
+    
 }
 
 extension HomeViewController: EditDictionaryDataSource{
-    func dictionaryData() -> [String : Any] {
+    func editDictionary(dataForEdit data: [String : Any]) -> [String : Any] {
         originData = DataConverter.convertToDictionary(text: (self.homeView?.jsonData.text)!)!
         return originData
     }
-    
-    
 }
